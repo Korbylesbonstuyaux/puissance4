@@ -1,0 +1,52 @@
+#game {
+  text-align: center;
+}
+
+#grid {
+  /*background-color: yellow;*/
+}
+
+#player1 {
+  color: red;
+}
+
+#player2 {
+  color: blue;
+}
+
+#player1 div, #player2 div {
+  display: block;
+  margin: auto;
+  background-color: transparent;
+}
+
+#player1 .bloc, #player2 .bloc {
+  border: none;
+}
+
+
+.bloc {
+  width: 100px;
+  height: 100px;
+  /*background-color: yellow;*/
+  border: 1px solid black;
+  display: inline-block;
+  /*margin: 5px;*/
+}
+
+/* CIRCLE */
+.circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.player1 {
+  border: 4px solid red;
+  background-color: red !important;
+}
+
+.player2 {
+  border: 4px solid blue;
+  background-color: blue !important;
+}

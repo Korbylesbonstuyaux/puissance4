@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EXO Javascript</title>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Passion+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="puissance4.css">
+  </head>
+  <body>
+      <div id="game">
+        <div class="container">
+          <div class="row">
+            <div id="player1" class="col-xs-1">
+              <h1>Player1</h1>
+              <div class="bloc">
+                <div class="circle player1">
+                </div>
+              </div>
+            </div>
+            <div id="grid" class="col-xs-10">
+              <div id="l1">
+                <div id="l1c1" class="bloc"></div>
+                <div id="l1c2" class="bloc"></div>
+                <div id="l1c3" class="bloc"></div>
+                <div id="l1c4" class="bloc"></div>
+                <div id="l1c5" class="bloc"></div>
+              </div>
+              <div id="l2">
+                <div id="l2c1" class="bloc"></div>
+                <div id="l2c2" class="bloc"></div>
+                <div id="l2c3" class="bloc"></div>
+                <div id="l2c4" class="bloc"></div>
+                <div id="l2c5" class="bloc"></div>
+              </div>
+              <div id="l3">
+                <div id="l3c1" class="bloc"></div>
+                <div id="l3c2" class="bloc"></div>
+                <div id="l3c3" class="bloc"></div>
+                <div id="l3c4" class="bloc"></div>
+                <div id="l3c5" class="bloc"></div>
+              </div>
+              <div id="l4">
+                <div id="l4c1" class="bloc"></div>
+                <div id="l4c2" class="bloc"></div>
+                <div id="l4c3" class="bloc"></div>
+                <div id="l4c4" class="bloc"></div>
+                <div id="l4c5" class="bloc"></div>
+              </div>
+              <div id="l5">
+                <div id="l5c1" class="bloc"></div>
+                <div id="l5c2" class="bloc"></div>
+                <div id="l5c3" class="bloc"></div>
+                <div id="l5c4" class="bloc"></div>
+                <div id="l5c5" class="bloc"></div>
+              </div>
+            </div>
+            <div id="player2" class="col-xs-1">
+              <h2>Player2</h2>
+              <div class="bloc">
+                <div class="circle player2">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div id="current" class="col-xs-12">
+              C'est au tour du joueur n°1.
+            </div>
+            <div id="menu" class="col-xs-12">
+              <button id="reset" type="button" name="button">RESET</button>
+              <label for="size-grid">Taille de la grille: </label>
+              <select id="size-grid" class="" name="size-grid">
+                <option value="2">2x2</option>
+                <option value="3">3x3</option>
+                <option value="4">4x4</option>
+                <option value="5">5x5</option>
+                <option value="6">6x6</option>
+                <option value="7" selected>7x7</option>
+                <option value="8">8x8</option>
+              </select>
+              <button id="change" type="button" name="button">Changer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      <!-- Include all compiled plugins (below), or include individual files as needed -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+      <script type="text/javascript">
+      var game = document.getElementById("game");
+      var current = document.getElementById("current");
+      var reset = document.getElementById("reset");
+      var size = document.getElementById("size-grid");
+      var change = document.getElementById("change");
+      var block = false;
+
+      var tab;
+      var nbLines = 8;
+      var nbColumns = 8;
+
+      var PLAYER1 = 1;
+      var PLAYER2 = 2;
+      var currentPlayer = PLAYER1;
+
+      game.addEventListener("click", function(e) {
+          if (!block)
+          {
+            play(e.target.id);
+          }
+      }, false);
+
+      reset.addEventListener("click", function(e) {
+          resetGrid();
+      }, false);
+
+      change.addEventListener("click", function(e) {
+          changeGrid();
+      }, false);
+
+      function initArray()
+      {
+          tab = new Array(nbLines);
+
+          for (var i = 0; i < nbLines; i++)
+          {
+            tab[i] = new Array(nbLines).fill(0);
+          }
+      }
+
+      function initPlayer()
+      {
+          // Current player Player1
+          currentPlayer = PLAYER1;
+
+          current.innerHTML = "C'est au tour du joueur n°"+currentPlayer;
+      }
+
+      function changeGrid()
+      {
+        var response = parseInt(size.options[size.selectedIndex].value);
+
+        if(response != nbLines)
+        {
+          nbLines = response;
+          nbColumns = response;
+          resetGrid();
+        }
+      }
+
+      function resetGrid()
+      {
+        var grid = document.getElementById("grid");
+        grid.innerHTML = "";
+
+        for (var l = 0; l < nbLines; l++)
+        {
+          var line = document.createElement('div');
+          var num = "l"+(l+1);
+          line.id = num;
+
+          for (var c = 0; c < nbColumns; c++)
+          {
+            var block = document.createElement('div');
+            block.id = num+"c"+(c+1);
+            block.className = "bloc";
+            line.appendChild(block);
+            line.innerHTML = line.innerHTML+"\n";
+          }
+
+          grid.appendChild(line);
+        }
+
+        // Reinit Array
+        initArray();
+        // Reinit
+        initPlayer();
+      }
+
+      function play(id)
+      {
+        if(/^l([0-9]{1})c([0-9]{1})$/.test(id))
+        {
+          var indexLine = RegExp.$1 - 1;
+          var indexColumn = RegExp.$2 - 1;
+
+          var minLine = minLineEmptyCase(indexLine, indexColumn);
+
+          if(minLine != -1)
+          {
+            block = true;
+            setTimeout(function() { animationAndChange(0, indexColumn, minLine); }, 100);
+          }
+        }
+      }
+
+      function result()
+      {
+        if(hasWon())
+        {
+          alert("FELICITATION Joueur n°"+currentPlayer+", vous avez gagné !");
+          resetGrid();
+        }
+        else if (fullGrid())
+             {
+               alert("DOMMAGE, aucun gagnant !");
+               resetGrid();
+             }
+             else
+                {
+                  changePlayer();
+                  current.innerHTML = "C'est au tour du joueur n°"+currentPlayer;
+                }
+      }
+
+      function changePlayer()
+      {
+        (currentPlayer === PLAYER1) ? currentPlayer = PLAYER2 : currentPlayer = PLAYER1;
+      }
+
+      function arrayToId(indexLine, indexColumn)
+      {
+        return "l"+(indexLine+1)+"c"+(indexColumn+1);
+      }
+
+      function minLineEmptyCase(indexLine, indexColumn)
+      {
+        var line = indexLine;
+        var stop = false;
+
+        while(!stop && (line < nbLines))
+        {
+          if(tab[line][indexColumn] != 0)
+          {
+            stop = true;
+          }
+          else line++;
+        }
+
+        return line - 1;
+      }
+
+      function animationAndChange(indexLine, indexColumn, minLine)
+      {
+        // Remove circle form line - 1
+        if((indexLine - 1) >= 0)
+        {
+          removeCircle(arrayToId(indexLine - 1, indexColumn));
+        }
+
+        // Add Circle if line < minLine
+        if(indexLine < minLine)
+        {
+          addCircle(arrayToId(indexLine, indexColumn));
+          setTimeout(function() { animationAndChange(indexLine + 1, indexColumn, minLine); }, 100);
+        }
+        else
+            {
+              if(indexLine === minLine)
+              {
+                changeCase(indexLine, indexColumn);
+                block = false;
+                result();
+              }
+            }
+      }
+
+      function addCircle(id)
+      {
+        var bloc = document.getElementById(id);
+
+        var circle = document.createElement('div');
+        circle.className = 'circle player'+currentPlayer;
+        bloc.appendChild(circle);
+      }
+
+      function removeCircle(id)
+      {
+        var bloc = document.getElementById(id);
+        bloc.innerHTML = "";
+      }
+
+      function changeCase(indexLine, indexColumn)
+      {
+        var bloc = document.getElementById(arrayToId(indexLine, indexColumn));
+
+        var circle = document.createElement('div');
+        circle.className = 'circle player'+currentPlayer;
+        bloc.appendChild(circle);
+        tab[indexLine][indexColumn] = currentPlayer;
+      }
+
+      function emptyCase(indexLine, indexColumn)
+      {
+        return (tab[indexLine][indexColumn] === 0) ? true : false;
+      }
+
+      function fullGrid()
+      {
+        var l = 0, c = 0;
+        var full = true;
+
+        while(l < nbLines && full)
+        {
+          c = 0;
+
+          while (c < nbColumns && full)
+          {
+            if(tab[l][c] == 0)
+            {
+              full = false;
+            }
+
+            c++;
+          }
+
+          l++;
+        }
+
+        return full;
+      }
+
+      function hasWon()
+      {
+        return (testLines() || testColumns() || testLeftDiagonals() || testRightDiagonals()) ? true : false;
+      }
+
+      function testLines()
+      {
+        var win = false;
+        var l = 0;
+
+        while(!win && (l < nbLines))
+        {
+          var c = 0;
+
+          while(!win && (c <= nbColumns - 4))
+          {
+            var index = 0;
+            var out = false;
+
+            while(index < 4 && !out)
+            {
+              if( (tab[l][c] != tab[l][c + index]) || (tab[l][c + index] == 0) )
+              {
+                out = true;
+              }
+              else index++;
+            }
+
+            if (!out)
+            {
+              win = true;
+            }
+
+            c++;
+          }
+
+          l++;
+        }
+
+        return win;
+      }
+
+      function testColumns()
+      {
+        var win = false;
+        var c = 0;
+
+        while(!win && (c < nbColumns))
+        {
+          var l = 0;
+
+          while(!win && (l <= nbLines - 4))
+          {
+            var index = 0;
+            var out = false;
+
+            while(index < 4 && !out)
+            {
+              if( (tab[l][c] != tab[l + index][c]) || (tab[l + index][c] == 0))
+              {
+                out = true;
+              }
+              else index++;
+            }
+
+            if (!out)
+            {
+              win = true;
+            }
+
+            l++;
+          }
+
+          c++;
+        }
+
+        return win;
+      }
+
+      function testLeftDiagonals()
+      {
+        var stop = false;
+        var win = false;
+        var l = 0, c = 0;
+        var index = 0;
+
+        // Pour chaque colonne
+        for (var i = 0; i < nbColumns; i++)
+        {
+          l = 0;
+          c = i;
+
+          // On se déplacer en diagonale
+          while((l < nbLines) && (c < nbColumns))
+          {
+            index = 0;
+            stop = false;
+
+            // on teste les 4 cases en diagonales suivantes si possible
+            while((l + index < nbLines) && (c + index < nbColumns) && !stop)
+            {
+              // Si index >= 4, => gagné
+              if(index >= 4)
+              {
+                stop = true;
+              }
+
+              if( (tab[l][c] != tab[l+index][c+index]) || (tab[l+index][c+index] == 0) )
+              {
+                stop = true;
+              }
+              else index++;
+           }
+
+           if(index >= 4)
+           {
+             win = true;
+           }
+
+            c++;
+            l++;
+          }
+
+        }
+
+        // Pour chaque line
+        for (var i = 0; i < nbLines; i++)
+        {
+          l = i;
+          c = 0;
+
+          // On se déplacer en diagonale
+          while((l < nbLines) && (c < nbColumns))
+          {
+            index = 0;
+            stop = false;
+
+            // on teste les 4 cases en diagonales suivantes si possible
+            while((l + index < nbLines) && (c + index < nbColumns) && !stop)
+            {
+              // Si index >= 4, => gagné
+              if(index >= 4)
+              {
+                stop = true;
+              }
+
+              if( (tab[l][c] != tab[l+index][c+index]) || (tab[l+index][c+index] == 0) )
+              {
+                stop = true;
+              }
+              else index++;
+           }
+
+           if(index >= 4)
+           {
+             win = true;
+           }
+
+            c++;
+            l++;
+          }
+
+        }
+
+        return win;
+      }
+
+      function testRightDiagonals()
+      {
+        var stop = false;
+        var win = false;
+        var l = 0, c = 0;
+        var index = 0;
+
+        // Pour chaque colonne
+        for (var i = nbColumns - 1; i >= 0; i--)
+        {
+          l = 0;
+          c = i;
+
+          // On se déplacer en diagonale
+          while((l < nbLines) && (c >= 0))
+          {
+            index = 0;
+            stop = false;
+
+            // on teste les 4 cases en diagonales suivantes si possible
+            while((l + index < nbLines) && (c - index >= 0) && !stop)
+            {
+              // Si index >= 4, => gagné
+              if(index >= 4)
+              {
+                stop = true;
+              }
+
+              if( (tab[l][c] != tab[l+index][c-index]) || (tab[l+index][c-index] == 0) )
+              {
+                stop = true;
+              }
+              else index++;
+           }
+
+           if(index >= 4)
+           {
+             win = true;
+           }
+
+            c--;
+            l++;
+          }
+
+        }
+
+        // Pour chaque line
+        for (var i = 0; i < nbLines; i++)
+        {
+          l = i;
+          c = nbColumns - 1;
+
+          // On se déplacer en diagonale
+          while((l < nbLines) && (c >= 0))
+          {
+            index = 0;
+            stop = false;
+
+            // on teste les 4 cases en diagonales suivantes si possible
+            while((l + index < nbLines) && (c - index >= 0) && !stop)
+            {
+              // Si index >= 4, => gagné
+              if(index >= 4)
+              {
+                stop = true;
+              }
+
+              if( (tab[l][c] != tab[l+index][c-index]) || (tab[l+index][c-index] == 0) )
+              {
+                stop = true;
+              }
+              else index++;
+           }
+
+           if(index >= 4)
+           {
+             win = true;
+           }
+
+            c--;
+            l++;
+          }
+
+        }
+
+        return win;
+      }
+
+
+      // On load
+      resetGrid();
+      </script>
+  </body>
+</html>
